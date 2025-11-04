@@ -8,8 +8,6 @@ import { Teacher } from '../interfaces/teacher.interface';
 /**
  * Tests du service TeacherService - Gestion des professeurs
  * 
- * IMPORTANCE : ⭐⭐⭐⭐
- * 
  * Ce service gère les appels HTTP vers l'API des professeurs (teachers).
  * Il fournit les données nécessaires pour :
  * - Afficher la liste des professeurs disponibles
@@ -21,16 +19,13 @@ import { Teacher } from '../interfaces/teacher.interface';
  * 2. detail(id) : Récupération des détails d'un professeur (GET /api/teacher/:id)
  * 3. Gestion des erreurs HTTP (404, 401, 500)
  * 
- * TESTS ESSENTIELS :
+ * TESTS :
  * - Appels HTTP corrects (méthode GET, URL)
  * - Transformation des réponses en objets Teacher[]
  * - Gestion des cas limites (liste vide, professeur introuvable)
  * - Gestion des erreurs réseau
- * 
- * IMPACT MÉTIER :
- * - Utilisé dans le formulaire de création de session (sélection du professeur)
- * - Utilisé dans la page de détail d'une session (affichage du professeur)
  */
+
 describe('TeacherService', () => {
   let service: TeacherService;
   let httpMock: HttpTestingController;
@@ -75,22 +70,15 @@ describe('TeacherService', () => {
     httpMock.verify();
   });
 
-  /**
-   * Test de création du service
-   */
+  // Test de création du service
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  /**
-   * Tests de récupération de la liste des professeurs
-   * 
-   * IMPORTANCE : ⭐⭐⭐⭐
-   * Utilisé pour afficher la liste des professeurs dans le formulaire de création de session (admin)
-   */
-  describe('all', () => {
+  //Tests de récupération de la liste des professeurs
+  describe('Get all teachers', () => {
     /**
-     * Scénario nominal : récupération de tous les professeurs
+     * Récupération de tous les professeurs
      * Utilisé dans le formulaire de création de session
      */
     it('should retrieve all teachers', (done) => {
@@ -111,10 +99,7 @@ describe('TeacherService', () => {
       req.flush(mockTeachers);
     });
 
-    /**
-     * Cas limite : liste vide (aucun professeur)
-     * Important pour l'UX : afficher un message approprié
-     */
+    // Cas limite : liste vide (aucun professeur)
     it('should return empty array when no teachers exist', (done) => {
       // Act
       service.all().subscribe({
@@ -159,16 +144,8 @@ describe('TeacherService', () => {
     });
   });
 
-  /**
-   * Tests de récupération d'un professeur par ID
-   * 
-   * IMPORTANCE : ⭐⭐⭐⭐
-   * Utilisé pour afficher les informations du professeur dans la page de détail d'une session
-   */
-  describe('detail', () => {
-    /**
-     * Scénario nominal : récupération d'un professeur par ID
-     */
+  // Tests de récupération d'un professeur par ID
+  describe('Get teacher detail', () => {
     it('should retrieve a teacher by id', (done) => {
       // Arrange
       const teacherId = '1';
@@ -206,10 +183,7 @@ describe('TeacherService', () => {
       req.flush(mockTeacher);
     });
 
-    /**
-     * Gestion d'erreur : professeur non trouvé (404)
-     * Important pour éviter les erreurs d'affichage
-     */
+    // Gestion d'erreur : professeur non trouvé (404)
     it('should handle 404 error when teacher not found', (done) => {
       // Arrange
       const teacherId = '999';
@@ -225,7 +199,7 @@ describe('TeacherService', () => {
         }
       });
 
-      // Simulate HTTP error
+      // HTTP error
       const req = httpMock.expectOne(`api/teacher/${teacherId}`);
       req.flush('Teacher not found', { status: 404, statusText: 'Not Found' });
     });
