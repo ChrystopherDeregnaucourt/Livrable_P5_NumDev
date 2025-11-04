@@ -20,11 +20,6 @@ import { User } from '../interfaces/user.interface';
  * - Transformation des réponses en objets User
  * - Gestion des erreurs réseau et serveur
  * - Vérification des endpoints API
- * 
- * SÉCURITÉ :
- * - Les erreurs 401 (non autorisé) sont correctement propagées
- * - Les ID utilisateur sont validés côté API
- * - Aucune donnée sensible n'est exposée en cas d'erreur
  */
 
 describe('UserService', () => {
@@ -63,10 +58,7 @@ describe('UserService', () => {
 
   //Tests de récupération d'utilisateur par ID
   describe('getById', () => {
-    /**
-     * Récupération réussie d'un utilisateur
-     * Valide la transformation de la réponse HTTP en objet User
-     */
+    //Récupération réussie d'un utilisateur
     it('should retrieve a user by id', (done) => {
       // Arrange
       const userId = '1';
@@ -123,25 +115,21 @@ describe('UserService', () => {
         }
       });
 
-      // Simulate HTTP error
+      // HTTP error
       const req = httpMock.expectOne(`api/user/${userId}`);
       req.flush(errorMessage, { status: 404, statusText: 'Not Found' });
     });
   });
 
   /**
-   * Tests de suppression d'utilisateur
-   * 
-   * SÉCURITÉ :
+   * Tests de suppression d'utilisateur :
    * - Seul l'utilisateur connecté peut supprimer son propre compte (vérifié côté API)
    * - Les erreurs d'autorisation (401) doivent être gérées
    * - Les erreurs serveur ne doivent pas laisser l'état incohérent
    */
   describe('delete', () => {
-    /**
-     * Scénario nominal : suppression réussie
-     * Valide que la requête DELETE est correctement envoyée
-     */
+
+    //Valide que la requête DELETE est correctement envoyée
     it('should delete a user by id', (done) => {
       // Arrange
       const userId = '1';
@@ -162,10 +150,7 @@ describe('UserService', () => {
       req.flush({});
     });
 
-    /**
-     * Vérifie la construction correcte de l'URL DELETE avec l'ID
-     * Important pour éviter les erreurs API
-     */
+    //Vérifie la construction correcte de l'URL DELETE avec l'ID
     it('should call DELETE endpoint with correct user id', () => {
       // Arrange
       const userId = '15';
@@ -196,15 +181,12 @@ describe('UserService', () => {
         }
       });
 
-      // Simulate HTTP error
+      // HTTP error
       const req = httpMock.expectOne(`api/user/${userId}`);
       req.flush(errorMessage, { status: 500, statusText: 'Internal Server Error' });
     });
 
-    /**
-     * Gestion d'erreur d'autorisation (401)
-     * Empêche un utilisateur de supprimer le compte d'un autre
-     */
+    //Gestion d'erreur d'autorisation (401) : Empêche un utilisateur de supprimer le compte d'un autre
     it('should handle 401 unauthorized error', (done) => {
       // Arrange
       const userId = '1';
@@ -219,30 +201,27 @@ describe('UserService', () => {
         }
       });
 
-      // Simulate HTTP error
+      // HTTP error
       const req = httpMock.expectOne(`api/user/${userId}`);
       req.flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
     });
   });
 
-  /**
-   * Tests de cohérence des endpoints API
-   * Vérifie que tous les appels utilisent le bon chemin de base
-   */
+  //Tests de cohérence des endpoints API : Vérifie que tous les appels utilisent le bon chemin de base
   describe('API path', () => {
 
     it('should use correct base path for all requests', () => {
-      // Act - getById
+      // Act
       service.getById('1').subscribe();
       const getReq = httpMock.expectOne('api/user/1');
       getReq.flush(mockUser);
 
-      // Act - delete
+      // Act
       service.delete('1').subscribe();
       const deleteReq = httpMock.expectOne('api/user/1');
       deleteReq.flush({});
 
-      // Assert - vérifie que les paths commencent bien par 'api/user'
+      // Assert
       expect(getReq.request.url).toContain('api/user');
       expect(deleteReq.request.url).toContain('api/user');
     });
