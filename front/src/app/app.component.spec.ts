@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { MatToolbarModule } from '@angular/material/toolbar';
