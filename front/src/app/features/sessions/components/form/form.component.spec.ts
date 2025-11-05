@@ -107,9 +107,14 @@ describe('FormComponent', () => {
     // Mock ActivatedRoute
     mockActivatedRoute = {
       snapshot: {
-        paramMap: convertToParamMap({ id: null })
-      }
-    } as ActivatedRoute;
+        paramMap: {
+          get: jest.fn().mockReturnValue(null),
+          has: jest.fn(),
+          getAll: jest.fn(),
+          keys: []
+        }
+      } as Partial<ActivatedRoute['snapshot']>
+    } as Partial<ActivatedRoute>;
 
     await TestBed.configureTestingModule({
       declarations: [FormComponent],
