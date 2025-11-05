@@ -10,7 +10,7 @@ import { UnauthGuard } from './unauth.guard';
  *
  * RÔLE : Empêche les utilisateurs CONNECTÉS d'accéder aux pages publiques (login, register)
  * 
- * SCÉNARIOS TESTÉS :
+ * Ces tests couvrent :
  * - Utilisateur non connecté → peut accéder à login/register
  * - Utilisateur connecté → redirigé automatiquement vers /rentals (liste des sessions)
  * - Changement d'état de session (déconnexion/connexion)
