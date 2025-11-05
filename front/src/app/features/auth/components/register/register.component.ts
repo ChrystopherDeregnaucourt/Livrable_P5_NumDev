@@ -53,6 +53,7 @@ export class RegisterComponent {
   }
 
   public submit(): void {
+    //this.onError = false; // Réinitialise l'erreur à chaque nouvelle tentative
     const registerRequest = this.form.value as RegisterRequest;
     this.authService.register(registerRequest).subscribe({
         next: (_: void) => this.router.navigate(['/login']),
