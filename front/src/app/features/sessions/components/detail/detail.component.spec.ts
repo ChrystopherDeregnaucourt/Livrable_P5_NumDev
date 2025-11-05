@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { SessionService } from 'src/app/services/session.service';
 import { TeacherService } from 'src/app/services/teacher.service';
@@ -111,7 +112,8 @@ describe('DetailComponent', () => {
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
-        MatInputModule
+        MatInputModule,
+        RouterTestingModule
       ],
       providers: [
         { provide: SessionApiService, useValue: mockSessionApiService },

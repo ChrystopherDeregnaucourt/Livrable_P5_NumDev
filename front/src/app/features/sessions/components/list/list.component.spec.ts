@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { SessionService } from 'src/app/services/session.service';
 import { SessionApiService } from '../../services/session-api.service';
@@ -74,7 +75,8 @@ describe('ListComponent', () => {
       imports: [
         HttpClientModule,
         MatCardModule,
-        MatIconModule
+        MatIconModule,
+        RouterTestingModule
       ],
       providers: [
         { provide: SessionService, useValue: mockSessionService },

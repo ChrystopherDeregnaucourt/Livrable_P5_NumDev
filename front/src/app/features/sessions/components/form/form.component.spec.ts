@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { SessionService } from 'src/app/services/session.service';
 import { TeacherService } from 'src/app/services/teacher.service';
@@ -127,7 +128,8 @@ describe('FormComponent', () => {
         MatIconModule,
         MatInputModule,
         MatSelectModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        RouterTestingModule
       ],
       providers: [
         { provide: SessionApiService, useValue: mockSessionApiService },
