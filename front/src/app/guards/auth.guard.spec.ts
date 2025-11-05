@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { expect } from '@jest/globals';
@@ -5,16 +7,15 @@ import { SessionService } from '../services/session.service';
 import { AuthGuard } from './auth.guard';
 
 /**
- * TESTS CRITIQUES - AuthGuard
+ * TESTS - AuthGuard
  * 
- * JUSTIFICATION : Ces tests sont ESSENTIELS car ils couvrent :
+ * Ces tests couvrent :
  * 1. SÉCURITÉ ROUTES : Protection des pages nécessitant une authentification
  * 2. CONTRÔLE ACCÈS : Empêche l'accès non autorisé aux fonctionnalités sensibles  
  * 3. UX SÉCURITÉ : Redirection automatique vers login si non connecté
  * 4. ARCHITECTURE : Utilisé sur toutes les routes protégées de l'app
- * 
- * Impact critique : Défaillance = accès non autorisé aux données/fonctions sensibles
  */
+
 describe('AuthGuard', () => {
   let guard: AuthGuard;
   let mockRouter: Partial<Router>;
