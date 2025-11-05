@@ -9,16 +9,15 @@ import { SessionService } from '../services/session.service';
 import { JwtInterceptor } from './jwt.interceptor';
 
 /**
- * TESTS CRITIQUES - JwtInterceptor
+ * TESTS - JwtInterceptor
  * 
- * JUSTIFICATION : Ces tests sont ESSENTIELS car ils couvrent :
+ * Ces tests couvrent :
  * 1. SÉCURITÉ GLOBALE : Injection automatique du token JWT sur TOUTES les requêtes API
  * 2. AUTORISATION : Sans ce token, toutes les API retournent 401/403
  * 3. ARCHITECTURE : Point central d'authentification pour l'app
  * 4. ROBUSTESSE : Doit fonctionner avec tous les verbes HTTP (GET, POST, PUT, DELETE)
- * 
- * Impact critique : Défaillance = accès API impossible, app non fonctionnelle
  */
+
 describe('JwtInterceptor', () => {
   let interceptor: JwtInterceptor;
   let httpClient: HttpClient;
