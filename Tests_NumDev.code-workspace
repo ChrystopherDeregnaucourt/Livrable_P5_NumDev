@@ -1,0 +1,36 @@
+{
+  "folders": [
+    {
+      "name": "Root",
+      "path": "."
+    },
+    {
+      "name": "Front-end (Angular)",
+      "path": "./front"
+    },
+    {
+      "name": "Back-end (Spring Boot)",
+      "path": "./back"
+    }
+  ],
+  "settings": {
+    "typescript.preferences.includePackageJsonAutoImports": "on",
+    "typescript.suggest.autoImports": true,
+    "jest.runMode": "on-demand",
+    "typescript.validate.enable": true,
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/target": true,
+      "**/.angular": true,
+      "**/dist": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "angular.ng-template",
+      "ms-vscode.vscode-typescript-next",
+      "orta.vscode-jest",
+      "bradlc.vscode-tailwindcss"
+    ]
+  }
+}

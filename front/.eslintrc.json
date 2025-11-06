@@ -8,6 +8,9 @@
       "files": [
         "*.ts"
       ],
+      "excludedFiles": [
+        "cypress/**/*"
+      ],
       "parserOptions": {
         "project": [
           "tsconfig.json"
@@ -45,6 +48,24 @@
         "plugin:@angular-eslint/template/recommended"
       ],
       "rules": {}
+      },
+    {
+      "files": [
+        "cypress/**/*.ts"
+      ],
+      "parserOptions": {
+        "project": [
+          "cypress/tsconfig.json"
+        ],
+        "createDefaultProgram": true
+      },
+      "env": {
+        "mocha": true
+      },
+      "globals": {
+        "cy": "readonly",
+        "Cypress": "readonly"
+      }
     }
   ]
 }
