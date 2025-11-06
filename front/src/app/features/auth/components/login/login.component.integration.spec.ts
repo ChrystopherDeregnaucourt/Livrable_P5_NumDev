@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 // Imports des composants et services à tester
@@ -50,6 +51,7 @@ describe('LoginComponent integration', () => {
         MatButtonModule,
         MatFormFieldModule,
         MatIconModule,
+        MatCardModule,
         HttpClientTestingModule // Mock des appels HTTP
       ],
       providers: [SessionService, AuthService] // Services d'authentification et de session

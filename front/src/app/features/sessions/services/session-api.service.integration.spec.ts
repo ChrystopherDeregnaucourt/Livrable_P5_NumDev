@@ -263,8 +263,8 @@ describe('SessionApiService Integration Tests', () => {
     // Act: Inscrire l'utilisateur à la session
     service.participate(sessionId, userId).subscribe({
       next: (result) => {
-        // Assert: L'inscription retourne void mais est réussie
-        expect(result).toBeUndefined();
+        // Assert: L'inscription est réussie (peut retourner null ou undefined)
+        expect(result == null).toBeTruthy(); // null ou undefined acceptable
         done();
       },
       error: done.fail
@@ -291,8 +291,8 @@ describe('SessionApiService Integration Tests', () => {
     // Act: Désinscrire l'utilisateur de la session
     service.unParticipate(sessionId, userId).subscribe({
       next: (result) => {
-        // Assert: La désinscription retourne void mais est réussie
-        expect(result).toBeUndefined();
+        // Assert: La désinscription est réussie (peut retourner null ou undefined)
+        expect(result == null).toBeTruthy(); // null ou undefined acceptable
         done();
       },
       error: done.fail
@@ -369,25 +369,25 @@ describe('SessionApiService Integration Tests', () => {
    * S'assure que tous les endpoints utilisent la base 'api/session'
    */
   it('should maintain consistent API endpoint structure', () => {
-    // Act: Tester tous les endpoints du service
+    // Act: Tester tous les endpoints du service avec des IDs différents
     service.all().subscribe();
-    service.detail('1').subscribe();
+    service.detail('100').subscribe();
     service.create(mockSession).subscribe();
-    service.update('1', mockSession).subscribe();
-    service.delete('1').subscribe();
-    service.participate('1', '2').subscribe();
-    service.unParticipate('1', '2').subscribe();
+    service.update('200', mockSession).subscribe();
+    service.delete('300').subscribe();
+    service.participate('400', '500').subscribe();
+    service.unParticipate('600', '700').subscribe();
 
-    // Assert: Vérifier la cohérence des URLs
-    const requests = [
-      httpMock.expectOne('api/session'),                    // all()
-      httpMock.expectOne('api/session/1'),                  // detail()
-      httpMock.expectOne('api/session'),                    // create()
-      httpMock.expectOne('api/session/1'),                  // update()
-      httpMock.expectOne('api/session/1'),                  // delete()
-      httpMock.expectOne('api/session/1/participate/2'),    // participate()
-      httpMock.expectOne('api/session/1/participate/2')     // unParticipate()
-    ];
+    // Assert: Vérifier la cohérence des URLs en utilisant des matchers spécifiques
+    const allReq = httpMock.expectOne(req => req.url === 'api/session' && req.method === 'GET');
+    const detailReq = httpMock.expectOne('api/session/100');
+    const createReq = httpMock.expectOne(req => req.url === 'api/session' && req.method === 'POST');
+    const updateReq = httpMock.expectOne('api/session/200');
+    const deleteReq = httpMock.expectOne('api/session/300');
+    const participateReq = httpMock.expectOne('api/session/400/participate/500');
+    const unParticipateReq = httpMock.expectOne('api/session/600/participate/700');
+
+    const requests = [allReq, detailReq, createReq, updateReq, deleteReq, participateReq, unParticipateReq];
 
     // Vérifier que toutes les URLs commencent par 'api/session'
     requests.forEach(req => {
@@ -395,12 +395,12 @@ describe('SessionApiService Integration Tests', () => {
     });
 
     // Simuler les réponses
-    requests[0].flush(mockSessions);
-    requests[1].flush(mockSession);
-    requests[2].flush(mockSession);
-    requests[3].flush(mockSession);
-    requests[4].flush({});
-    requests[5].flush(null);
-    requests[6].flush(null);
+    allReq.flush(mockSessions);
+    detailReq.flush(mockSession);
+    createReq.flush(mockSession);
+    updateReq.flush(mockSession);
+    deleteReq.flush(null);
+    participateReq.flush(null);
+    unParticipateReq.flush(null);
   });
 });
