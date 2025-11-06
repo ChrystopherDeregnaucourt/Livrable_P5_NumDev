@@ -1,0 +1,110 @@
+{
+  "users": {
+    "admin": {
+      "id": 1,
+      "username": "yoga@studio.com",
+      "email": "yoga@studio.com",
+      "firstName": "Admin",
+      "lastName": "Admin",
+      "admin": true,
+      "password": "test!1234",
+      "token": "fake-jwt-token",
+      "createdAt": "2024-01-01T00:00:00",
+      "updatedAt": "2024-01-01T00:00:00"
+    },
+    "regularUser": {
+      "id": 2,
+      "username": "user@test.com",
+      "email": "user@test.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "admin": false,
+      "password": "test!1234",
+      "token": "fake-jwt-token-user",
+      "createdAt": "2024-02-01T00:00:00",
+      "updatedAt": "2024-02-01T00:00:00"
+    },
+    "newUser": {
+      "id": 3,
+      "username": "jane.smith@test.com",
+      "email": "jane.smith@test.com",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "admin": false,
+      "password": "password123",
+      "token": "fake-jwt-token-new",
+      "createdAt": "2024-11-06T00:00:00",
+      "updatedAt": "2024-11-06T00:00:00"
+    }
+  },
+  "teachers": [
+    {
+      "id": 1,
+      "firstName": "Margot",
+      "lastName": "DELAHAYE",
+      "createdAt": "2024-01-01T00:00:00",
+      "updatedAt": "2024-01-01T00:00:00"
+    },
+    {
+      "id": 2,
+      "firstName": "Hélène",
+      "lastName": "THIERCELIN",
+      "createdAt": "2024-01-01T00:00:00",
+      "updatedAt": "2024-01-01T00:00:00"
+    }
+  ],
+  "sessions": [
+    {
+      "id": 1,
+      "name": "Morning Yoga",
+      "description": "Start your day with energy",
+      "date": "2024-12-01T08:00:00",
+      "teacher_id": 1,
+      "users": [],
+      "createdAt": "2024-11-01T00:00:00",
+      "updatedAt": "2024-11-01T00:00:00"
+    },
+    {
+      "id": 2,
+      "name": "Evening Relaxation",
+      "description": "Wind down your day",
+      "date": "2024-12-01T18:00:00",
+      "teacher_id": 2,
+      "users": [1],
+      "createdAt": "2024-11-01T00:00:00",
+      "updatedAt": "2024-11-01T00:00:00"
+    },
+    {
+      "id": 3,
+      "name": "Lunch Break Yoga",
+      "description": "Refresh your mind during lunch",
+      "date": "2024-12-02T12:00:00",
+      "teacher_id": 1,
+      "users": [1, 2],
+      "createdAt": "2024-11-01T00:00:00",
+      "updatedAt": "2024-11-01T00:00:00"
+    }
+  ],
+  "errors": {
+    "invalidCredentials": {
+      "statusCode": 401,
+      "message": "Invalid credentials"
+    },
+    "emailExists": {
+      "statusCode": 400,
+      "message": "Email already exists"
+    },
+    "notFound": {
+      "statusCode": 404,
+      "message": "Resource not found"
+    },
+    "unauthorized": {
+      "statusCode": 403,
+      "message": "Unauthorized"
+    },
+    "serverError": {
+      "statusCode": 500,
+      "message": "Internal server error"
+    }
+  }
+}
