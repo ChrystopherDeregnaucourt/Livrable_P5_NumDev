@@ -23,7 +23,8 @@
       "**/target": true,
       "**/.angular": true,
       "**/dist": true
-    }
+    },
+    "java.compile.nullAnalysis.mode": "automatic"
   },
   "extensions": {
     "recommendations": [
