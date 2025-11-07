@@ -47,13 +47,55 @@ By default the admin account is:
 
 ### Test
 
-#### E2E
+#### E2E Tests (Cypress)
 
-Launching e2e test:
+📚 **Documentation complète des tests E2E** : [INDEX_TESTS_E2E.md](INDEX_TESTS_E2E.md)
 
-> npm run e2e
+**Quick Start :**
+```bash
+# Mode interactif (recommandé)
+npm run cypress:open
 
-Generate coverage report (you should launch e2e test before):
+# Mode headless (CI/CD)
+npm run cypress:run
+
+# Avec serveur automatique
+npm run cypress:test
+```
+
+**Tests disponibles :**
+- ✅ Login & Register (11 tests)
+- ✅ Sessions CRUD (15+ tests)
+- ✅ Profil utilisateur (5 tests)
+- ✅ Navigation & Guards (10+ tests)
+- ✅ Workflows complets (3 scénarios)
+
+**Guides :**
+- 🚀 [Quick Start](QUICK_START_E2E.md) - Démarrage en 3 étapes
+- 📖 [Guide complet](TESTS_E2E_GUIDE.md) - Documentation détaillée
+- 📝 [Index des tests](INDEX_TESTS_E2E.md) - Navigation rapide
+- 📋 [Résumé](../RESUME_TESTS_E2E.md) - Vue d'ensemble
+
+**Tests spécifiques :**
+```bash
+# Login uniquement
+npx cypress run --spec "cypress/e2e/login.cy.ts"
+
+# Sessions uniquement
+npx cypress run --spec "cypress/e2e/sessions.cy.ts"
+
+# Workflows complets
+npx cypress run --spec "cypress/e2e/complete-workflow.cy.ts"
+```
+
+**Commandes personnalisées disponibles :**
+```typescript
+cy.loginAsAdmin()           // Login en tant qu'admin
+cy.loginAsUser()            // Login en tant qu'utilisateur
+cy.setupSessionIntercepts() // Configuration des intercepts
+```
+
+Generate coverage report (legacy):
 
 > npm run e2e:coverage
 

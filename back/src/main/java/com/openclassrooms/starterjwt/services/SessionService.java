@@ -45,8 +45,12 @@ public class SessionService {
 
     public void participate(Long id, Long userId) {
         Session session = this.sessionRepository.findById(id).orElse(null);
+        if (session == null) {
+            throw new NotFoundException();
+        }
+        
         User user = this.userRepository.findById(userId).orElse(null);
-        if (session == null || user == null) {
+        if (user == null) {
             throw new NotFoundException();
         }
 
