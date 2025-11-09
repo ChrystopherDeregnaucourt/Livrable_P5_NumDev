@@ -1,0 +1,613 @@
+# Tests d'intégration
+
+---
+
+# Components
+## `front\src\app\components\me\me.component.integration.spec.ts`
+
+#### Teste `MeComponent` (Tests d'intégration)
+
+**Description :** Tests d'intégration du composant de profil utilisateur - Validation des flux complets avec vraies requêtes HTTP
+
+**Tests :**
+
+**Affichage des informations utilisateur récupérées depuis l'API :**
+
+- Flux complet de récupération et d'affichage des données : on vérifie qu'après authentification de l'utilisateur, une requête HTTP GET est envoyée vers `api/user/{id}`, que les données de l'API sont correctement affichées dans le DOM (email, firstName dans le template), que le composant stocke les données utilisateur reçues
+
+**Suppression complète d'un compte utilisateur :**
+
+- Processus complet de suppression avec toutes les étapes : on vérifie qu'après chargement initial des données utilisateur, l'appel de `delete()` envoie une requête HTTP DELETE vers `api/user/{id}`, qu'un message de confirmation est affiché via `MatSnackBar` ("Your account has been deleted !"), que l'utilisateur est déconnecté (`SessionService.logOut`), que la navigation vers la page d'accueil (`['/']`) est effectuée, que toutes les opérations s'enchaînent correctement de façon asynchrone
+
+**Masquage de la section de suppression pour les administrateurs :**
+
+- Adaptation de l'interface selon le rôle utilisateur : on vérifie qu'avec un profil administrateur (`admin: true`), la requête API retourne un utilisateur admin, que le bouton "Delete" n'est pas rendu dans le DOM, que les administrateurs ne peuvent pas supprimer leur propre compte (sécurité)
+
+**Nombre de tests :** 3 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent de vraies requêtes HTTP mockées (pas de services mockés) pour valider les flux complets et l'intégration entre les composants, services et API.
+
+
+---
+
+# Features
+
+## `front\src\app\features\auth\components\login\login.component.integration.spec.ts`
+
+#### Teste `LoginComponent` (Tests d'intégration)
+
+**Description :** Tests d'intégration du composant de connexion - Validation des flux complets d'authentification avec vraies requêtes HTTP
+
+**Tests :**
+
+**Processus complet d'authentification utilisateur :**
+
+- Flux authentification avec interaction DOM réelle : on vérifie que la saisie utilisateur dans les champs email et password du formulaire déclenche une requête HTTP POST vers `api/auth/login`, que le corps de la requête contient les credentials saisis (`email: jane.doe@example.com, password: secret`), qu'après réponse API réussie, `SessionService.sessionInformation` est mis à jour avec les données reçues, que `SessionService.isLogged` passe à `true`, que la navigation vers `['/sessions']` est effectuée automatiquement
+
+**Gestion des erreurs d'authentification :**
+
+- Affichage d'erreur lors d'échec d'authentification : on vérifie qu'avec des identifiants incorrects (`john@example.com / bad`), la soumission du formulaire déclenche une requête HTTP POST vers `api/auth/login`, qu'une réponse d'erreur HTTP 401 (Unauthorized) est correctement gérée, que `component.onError` passe à `true` pour permettre l'affichage du message d'erreur, que l'utilisateur n'est pas connecté (`sessionInformation` reste `undefined`, `isLogged` reste `false`)
+
+**Nombre de tests :** 2 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests simulent le comportement utilisateur réel (saisie dans le DOM, clic sur bouton) et utilisent de vraies requêtes HTTP mockées pour valider l'intégration complète entre le composant, les services et l'API backend.
+
+## `front\src\app\features\auth\components\register\register.component.integration.spec.ts`
+
+#### Teste `RegisterComponent` (Tests d'intégration)
+
+**Description :** Tests d'intégration du composant d'inscription - Validation des flux complets d'inscription avec vraies requêtes HTTP
+
+**Tests :**
+
+**Processus complet d'inscription utilisateur :**
+
+- Flux inscription avec interaction DOM réelle : on vérifie que la saisie utilisateur dans tous les champs du formulaire (email, firstName, lastName, password) déclenche une requête HTTP POST vers `api/auth/register`, que le corps de la requête contient les données d'inscription complètes (`email: new.user@example.com, firstName: New, lastName: User, password: password`), qu'après réponse API réussie (status 201), la navigation vers `['/login']` est effectuée automatiquement, que `component.onError` reste à `false` (aucune erreur d'affichage)
+
+**Gestion des erreurs lors de l'inscription :**
+
+- Affichage d'erreur lors d'échec d'inscription : on vérifie qu'avec des données problématiques (email déjà existant `duplicate@example.com`, mot de passe faible `weak`), la soumission du formulaire déclenche une requête HTTP POST vers `api/auth/register`, qu'une réponse d'erreur HTTP 409 (Conflict - email déjà utilisé) est correctement gérée, que `component.onError` passe à `true` pour permettre l'affichage du message d'erreur à l'utilisateur, qu'aucune navigation n'est effectuée (l'utilisateur reste sur le formulaire pour corriger les erreurs)
+
+**Nombre de tests :** 2 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests simulent le comportement utilisateur réel (saisie dans les champs du DOM, clic sur le bouton d'inscription) et utilisent de vraies requêtes HTTP mockées pour valider l'intégration complète entre le composant, le service `AuthService` et l'API backend d'inscription.
+
+## `front\src\app\features\sessions\components\detail\detail.component.integration.spec.ts`
+
+#### Teste `DetailComponent` (Tests d'intégration)
+
+**Description :** Tests d'intégration du composant de détail de session - Validation des flux complets avec vraies requêtes HTTP
+
+**Tests :**
+
+**Chargement des détails de la session et du professeur :**
+
+- Flux complet de récupération et d'affichage des données : on vérifie qu'après initialisation du composant avec un utilisateur connecté, une requête HTTP GET est envoyée vers `api/session/{id}` pour récupérer les détails de la session, qu'une requête HTTP GET est envoyée vers `api/teacher/{teacher_id}` pour récupérer les informations du professeur, que les données sont correctement stockées dans `component.session` et `component.teacher`, que le DOM affiche les informations récupérées (nom de la session "Sunrise Flow", description) comme en production
+
+**Basculement d'état de participation basé sur les réponses API :**
+
+- Cycle complet inscription → désinscription avec actualisation des données : on vérifie qu'après chargement initial des données, l'appel de `participate()` envoie une requête HTTP POST vers `api/session/{id}/participate/{userId}`, que les données de session sont rechargées après inscription (nouvelles données avec l'utilisateur ajouté), que `component.isParticipate` passe à `true` et `component.session.users` contient l'utilisateur, qu'ensuite l'appel de `unParticipate()` envoie une requête HTTP DELETE vers le même endpoint, que les données sont à nouveau rechargées (utilisateur retiré de la liste), que `component.isParticipate` repasse à `false`
+
+**Suppression de session par un administrateur :**
+
+- Flux complet suppression avec notification et redirection : on vérifie qu'avec un utilisateur administrateur connecté, après chargement initial des données de session et professeur, l'appel de `delete()` envoie une requête HTTP DELETE vers `api/session/{id}`, qu'un message de confirmation est affiché via `MatSnackBar` ("Session deleted !"), que la navigation vers la liste des sessions (`['sessions']`) est effectuée, que toutes les opérations s'enchaînent correctement de façon asynchrone
+
+**Nombre de tests :** 3 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent de vraies requêtes HTTP mockées et simulent les interactions utilisateur complètes pour valider l'intégration entre le composant, les services (`SessionApiService`, `TeacherService`) et l'API backend, reproduisant fidèlement le comportement en production.
+
+## `front\src\app\features\sessions\components\form\form.component.integration.spec.ts`
+
+#### Teste `FormComponent` (Tests d'intégration)
+
+**Description :** Tests d'intégration du composant de formulaire de session - Validation des flux complets de création/modification avec vraies requêtes HTTP
+
+**Tests :**
+
+**Redirection des utilisateurs non-administrateurs :**
+
+- Contrôle d'accès basé sur le rôle utilisateur : on vérifie qu'avec un utilisateur non-admin (`admin: false`), après chargement des professeurs depuis l'API (`api/teacher`), la navigation vers `['/sessions']` est automatiquement déclenchée, empêchant l'accès au formulaire (sécurité)
+
+**Initialisation d'un formulaire vierge en mode création :**
+
+- Configuration du formulaire pour nouvelle session : on vérifie qu'avec un administrateur et l'URL `/sessions/create`, après chargement de la liste des professeurs depuis `api/teacher`, `component.onUpdate` est à `false` (mode création), que tous les champs du formulaire sont vides et prêts pour la saisie
+
+**Pré-remplissage du formulaire en mode modification :**
+
+- Chargement des données existantes pour modification : on vérifie qu'avec l'URL `/sessions/update/10`, une requête HTTP GET est envoyée vers `api/session/{id}` pour récupérer la session existante, qu'une requête HTTP GET est envoyée vers `api/teacher` pour charger la liste des professeurs, que `component.onUpdate` est à `true` (mode modification), que le formulaire est pré-rempli avec les données de la session (name, date formatée, teacher_id, description)
+
+**Processus complet de création d'une session :**
+
+- Flux création avec notification et navigation : on vérifie qu'en mode création après chargement des professeurs, le remplissage du formulaire avec des données valides (`Morning Session, 2024-08-01, teacher_id, Start strong`), la soumission envoie une requête HTTP POST vers `api/session` avec les données du formulaire, qu'un message de succès est affiché via `MatSnackBar` ("Session created !"), que la navigation vers `['sessions']` est effectuée
+
+**Processus complet de modification d'une session :**
+
+- Flux modification avec notification et navigation : on vérifie qu'en mode modification après chargement des données existantes et des professeurs, la modification des données du formulaire (`Updated Session, Updated description`), la soumission envoie une requête HTTP PUT vers `api/session/{id}` avec les données modifiées, qu'un message de succès est affiché via `MatSnackBar` ("Session updated !"), que la navigation vers `['sessions']` est effectuée
+
+**Nombre de tests :** 5 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent de vraies requêtes HTTP mockées et simulent les interactions utilisateur complètes (remplissage formulaire, soumission) pour valider l'intégration entre le composant, les services (`SessionApiService`, `TeacherService`) et l'API backend, reproduisant fidèlement les flux de production.
+
+## `front\src\app\features\sessions\components\list\list.component.integration.spec.ts`
+
+#### Teste `ListComponent` (Tests d'intégration)
+
+**Description :** Tests d'intégration du composant de liste des sessions - Validation de l'affichage et des contrôles selon les permissions utilisateur
+
+**Tests :**
+
+**Affichage de la liste des sessions avec actions administrateur :**
+
+- Rendu complet pour utilisateur admin avec toutes les fonctionnalités : on vérifie qu'avec un utilisateur administrateur (`admin: true`), une requête HTTP GET est envoyée vers `api/session` pour récupérer les sessions, que `component.sessions$` Observable est défini et fonctionnel, que le DOM affiche autant de cartes que de sessions mockées (2 sessions), que le bouton de création "Create" est visible (`button[routerlink="create"]`), que le contenu des sessions est correctement affiché (titre "Morning Flow" de la première session)
+
+**Masquage des contrôles administrateur pour utilisateurs standards :**
+
+- Interface adaptée selon les permissions utilisateur : on vérifie qu'avec un utilisateur standard (`admin: false`), après récupération des sessions depuis `api/session`, le bouton de création n'est pas présent dans le DOM (`createButton` est `null`), que les boutons d'édition ne sont pas affichés (aucun bouton contenant "Edit"), que l'interface s'adapte automatiquement selon le rôle utilisateur pour la sécurité
+
+**Nombre de tests :** 2 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent de vraies requêtes HTTP mockées pour valider l'intégration complète entre le composant, le service `SessionApiService` et l'API backend, tout en vérifiant que l'affichage conditionnel des fonctionnalités administrateur fonctionne correctement dans le DOM rendu.
+
+
+## `front\src\app\features\auth\services\auth.service.integration.spec.ts`
+
+ Différence avec les tests unitaires :
+ * Test avec HttpClient RÉEL pour valider l'intégration réseau
+ * Validation des payloads complets envoyés/reçus
+ * Test des conditions d'erreur réseau réelles
+ * Vérification de la sérialisation/désérialisation JSON
+
+#### Teste `AuthService` (Tests d'intégration)
+
+**Description :** Tests d'intégration du service d'authentification - Validation des flux complets avec vraies requêtes HTTP
+
+**Tests :**
+
+**Création du service :**
+
+- Le service doit être créé correctement
+
+**Flux complet de connexion réussie :**
+
+- Authentification complète avec données réalistes : on vérifie qu'une requête HTTP POST est envoyée vers `api/auth/login` avec les credentials, que tous les headers HTTP sont corrects (Content-Type: application/json), que la réponse contient un token JWT réaliste (longueur > 50 caractères), que toutes les informations de session sont retournées (token, id, username, firstName, lastName, admin), que l'username correspond à l'email de connexion
+
+**Flux complet d'inscription réussie :**
+
+- Processus d'enregistrement avec validation complète : on vérifie qu'une requête HTTP POST est envoyée vers `api/auth/register` avec toutes les données (email, firstName, lastName, password), que toutes les données nécessaires sont correctement transmises, que la réponse est `void/undefined` pour une inscription réussie, que l'URL et la méthode HTTP sont correctes
+
+**Gestion des erreurs d'authentification réalistes :**
+
+- Traitement des identifiants incorrects : on vérifie qu'avec des credentials invalides, une erreur HTTP 401 (Unauthorized) est correctement propagée, que les détails de l'erreur sont disponibles (status, statusText, error), que le message d'erreur est récupérable
+
+**Gestion des erreurs d'inscription (email déjà utilisé) :**
+
+- Traitement des conflits lors de l'inscription : on vérifie qu'avec un email déjà existant, une erreur HTTP 409 (Conflict) est correctement gérée, que le message "Email already exists" est retourné, qu'aucune inscription n'est effectuée
+
+**Validation des données avec caractères spéciaux :**
+
+- Intégration avec données internationales : on vérifie que les emails avec caractères spéciaux (`utilisateur.spécial+test@domaine-test.fr`) sont correctement traités, que les mots de passe avec accents et caractères spéciaux (`MöTdePa$$e_Ávec@Çaractères123!`) sont préservés, que les réponses contiennent les caractères spéciaux intacts
+
+**Gestion des erreurs réseau et timeouts :**
+
+- Traitement des problèmes de connectivité : on vérifie que les erreurs réseau (serveur inaccessible) génèrent une erreur avec status 0, que les timeouts et problèmes de connectivité sont correctement gérés
+
+**Validation des headers HTTP complets :**
+
+- Vérification des headers de requête : on vérifie que toutes les requêtes incluent automatiquement `Content-Type: application/json`, que les headers sont correctement configurés par Angular HttpClient, que le body de la requête est au format JSON
+
+**Requêtes simultanées (login + register) :**
+
+- Gestion de requêtes en parallèle : on vérifie que le service peut traiter simultanément une connexion et une inscription, que les deux requêtes HTTP sont envoyées correctement en parallèle, que chaque requête conserve ses propres données et méthodes
+
+**Nombre de tests :** 9 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent `HttpClientTestingModule` pour simuler de vraies requêtes HTTP et valider l'intégration complète du service avec l'API backend, incluant la gestion des erreurs, des caractères spéciaux, et des scénarios de connectivité réseau réalistes.
+
+
+## `front\src\app\features\sessions\services\session-api.service.integration.spec.ts`
+
+Différence avec les tests unitaires :
+ * Test avec HttpClient RÉEL pour valider l'intégration réseau complète
+ * Validation des payloads JSON complets (dates, arrays, objets complexes)
+ * Test des conditions d'erreur métier réelles (session non trouvée, etc.)
+ * Vérification de la sérialisation des types complexes (Date, objets imbriqués)
+
+#### Teste `SessionApiService` (Tests d'intégration)
+
+**Description :** Tests d'intégration du service API des sessions - Validation des opérations CRUD complètes avec vraies requêtes HTTP
+
+**Tests :**
+
+**Création du service :**
+
+- Le service doit être créé correctement
+
+**Récupération de toutes les sessions avec données complètes :**
+
+- Intégration complète pour l'affichage de la liste : on vérifie qu'une requête HTTP GET est envoyée vers `api/session`, que la structure des données est complète (id, name, description, teacher_id, users, dates), que toutes les propriétés sont du bon type (Date pour les dates), que les données métier sont cohérentes (utilisateurs inscrits, description détaillée)
+
+**Récupération des détails d'une session spécifique :**
+
+- Intégration pour l'affichage des détails complets : on vérifie qu'une requête HTTP GET est envoyée vers `api/session/{id}`, que toutes les propriétés détaillées sont présentes (description étendue, liste complète des participants), que les types de données sont corrects (Date, Array)
+
+**Création d'une nouvelle session avec validation métier complète :**
+
+- Processus complet de création avec données business : on vérifie qu'une requête HTTP POST est envoyée vers `api/session` avec toutes les propriétés métier, que la session créée reçoit un ID généré par le serveur, que les timestamps sont correctement gérés (createdAt, updatedAt), que les données métier sont validées (teacher_id, description complète)
+
+**Mise à jour d'une session avec modifications multiples :**
+
+- Modifications avec gestion des participants : on vérifie qu'une requête HTTP PUT est envoyée vers `api/session/{id}`, que plusieurs champs peuvent être modifiés simultanément (nom, description, heure, participants), que les nouveaux participants sont correctement ajoutés, que le timestamp de modification est mis à jour
+
+**Suppression d'une session avec validation de l'ID :**
+
+- Processus complet de suppression : on vérifie qu'une requête HTTP DELETE est envoyée vers `api/session/{id}`, que la suppression retourne une confirmation, que l'ID de session est correctement validé
+
+**Inscription d'un utilisateur à une session :**
+
+- Processus métier d'inscription avec IDs réels : on vérifie qu'une requête HTTP POST est envoyée vers `api/session/{sessionId}/participate/{userId}`, que l'inscription retourne void en cas de succès, que les IDs de session et d'utilisateur sont correctement transmis
+
+**Désinscription d'un utilisateur d'une session :**
+
+- Processus métier de désinscription : on vérifie qu'une requête HTTP DELETE est envoyée vers `api/session/{sessionId}/participate/{userId}`, que la désinscription retourne void en cas de succès, que l'URL est correctement construite
+
+**Gestion des erreurs métier (session non trouvée) :**
+
+- Traitement des cas d'erreur réalistes : on vérifie qu'avec un ID inexistant, une erreur HTTP 404 (Not Found) est correctement propagée, que le message d'erreur métier est récupérable ("Session not found"), que les détails d'erreur sont complets
+
+**Opérations simultanées sur différentes sessions :**
+
+- Gestion de requêtes en parallèle : on vérifie que le service peut traiter simultanément plusieurs opérations (detail, participate, delete), que chaque requête conserve ses propres paramètres et méthodes HTTP, que toutes les réponses sont correctement gérées
+
+**Validation de la cohérence des endpoints API :**
+
+- Structure uniforme des URLs : on vérifie que tous les endpoints (all, detail, create, update, delete, participate, unParticipate) utilisent la base `api/session`, que la structure des URLs est cohérente et prévisible, que les méthodes HTTP correspondent aux opérations CRUD
+
+**Nombre de tests :** 11 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent `HttpClientTestingModule` pour simuler de vraies requêtes HTTP et valident l'intégration complète du service avec l'API backend, incluant la gestion des données métier complexes (sessions de yoga, participants, professeurs) et des opérations business critiques.
+
+
+---
+
+# Guards
+
+
+## `front\src\app\guards\auth.guard.integration.spec.ts`
+
+Différence avec les tests unitaires :
+ * Ici on teste avec des services RÉELS pour valider l'intégration
+ * Navigation effective dans l'application
+ * État de session partagé entre composants
+
+#### Teste `AuthGuard` (Tests d'intégration)
+
+**Description :** Tests d'intégration du guard d'authentification - Validation des flux complets de sécurité avec routeur et services réels
+
+**Tests :**
+
+**Création du guard :**
+
+- Le guard doit être créé correctement
+
+**Navigation autorisée pour utilisateur authentifié :**
+
+- Accès aux routes protégées avec session active : on vérifie qu'après connexion d'un utilisateur via `SessionService.logIn()`, la navigation vers `/sessions` (route protégée) réussit, que `location.path()` confirme l'URL finale `/sessions`, que `sessionService.isLogged` reste à `true`
+
+**Redirection automatique vers login pour utilisateur non authentifié :**
+
+- Flux complet de sécurité avec Router réel : on vérifie qu'avec un utilisateur non connecté (`sessionService.isLogged = false`), la tentative de navigation vers `/sessions` déclenche une redirection automatique, que `location.path()` indique `/login`, que l'état de session reste non connecté
+
+**Protection cohérente de plusieurs routes :**
+
+- Validation sur différentes routes protégées : on vérifie qu'avec un utilisateur non connecté, la navigation vers `/sessions` redirige vers `/login`, que la navigation vers `/protected` redirige également vers `/login`, que le guard fonctionne de manière cohérente sur toutes les routes
+
+**Gestion des changements d'état de session en temps réel :**
+
+- Réaction aux modifications d'état du SessionService : on vérifie qu'en Phase 1 (non connecté), la navigation vers `/sessions` redirige vers `/login`, qu'en Phase 2 après connexion via `sessionService.logIn()`, l'état utilisateur est mis à jour, qu'en Phase 3, la nouvelle tentative de navigation vers `/sessions` réussit, que les informations admin sont correctement propagées
+
+**Blocage d'accès après déconnexion :**
+
+- Persistance de la sécurité après logout : on vérifie qu'en Phase 1, un utilisateur connecté peut accéder à `/sessions`, qu'en Phase 2 après `sessionService.logOut()`, l'état de session est réinitialisé, qu'en Phase 3, la tentative de navigation vers `/protected` redirige vers `/login`, que `sessionService.isLogged` est à `false`
+
+**Validation avec différents types d'utilisateurs :**
+
+- Accès pour utilisateurs normaux et administrateurs : on vérifie qu'un utilisateur standard (`admin: false`) peut accéder aux routes protégées (`/sessions`), qu'après déconnexion et reconnexion en tant qu'admin (`admin: true`), l'accès aux routes protégées (`/protected`) fonctionne, que les informations de rôle admin sont correctement gérées
+
+**Nombre de tests :** 7 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent `RouterTestingModule` avec de vraies routes et composants mockés pour valider l'intégration complète entre `AuthGuard`, `Router`, `Location`, et `SessionService`, reproduisant fidèlement les flux de navigation et de sécurité en production.
+
+
+## `front\src\app\guards\unauth.guard.integration.spec.ts`
+
+Cas d'usage :
+ * Utilisateur connecté tape /login → redirigé vers /sessions
+ * Utilisateur connecté tape /register → redirigé vers /sessions
+ * Utilisateur non connecté peut accéder à login/register normalement
+
+#### Teste `UnauthGuard` (Tests d'intégration)
+
+**Description :** Tests d'intégration du guard de pages publiques - Validation des flux complets de redirection avec routeur et services réels
+
+**Tests :**
+
+**Création du guard :**
+
+- Le guard doit être créé correctement
+
+**Accès autorisé aux pages publiques pour utilisateur non connecté :**
+
+- Navigation vers login/register sans authentification : on vérifie qu'avec un utilisateur non connecté (`sessionService.isLogged = false`), la navigation vers `/login` réussit (`location.path() = '/login'`), que la navigation vers `/register` réussit (`location.path() = '/register'`), que les pages publiques restent accessibles
+
+**Redirection automatique des utilisateurs connectés :**
+
+- Flux complet de redirection avec Router réel : on vérifie qu'après connexion d'un utilisateur via `SessionService.logIn()`, la tentative de navigation vers `/login` déclenche une redirection automatique vers `/rentals`, que la tentative de navigation vers `/register` déclenche également une redirection vers `/rentals`, que les utilisateurs connectés ne peuvent pas accéder aux pages d'authentification
+
+**Gestion des changements d'état de session en temps réel :**
+
+- Réaction dynamique aux connexions/déconnexions : on vérifie qu'en Phase 1 (non connecté), l'accès à `/login` est autorisé, qu'en Phase 2 après connexion via `sessionService.logIn()`, la tentative d'accès à `/login` redirige vers `/rentals`, qu'en Phase 3 après `sessionService.logOut()`, l'accès à `/login` est à nouveau autorisé, que le guard s'adapte dynamiquement à l'état de session
+
+**Redirection cohérente pour tous types d'utilisateurs :**
+
+- Traitement identique des utilisateurs normaux et administrateurs : on vérifie qu'un utilisateur standard (`admin: false`) connecté est redirigé depuis `/register` vers `/rentals`, qu'après déconnexion et reconnexion en tant qu'admin (`admin: true`), la redirection depuis `/login` vers `/rentals` fonctionne également, que le rôle utilisateur n'affecte pas le comportement du guard
+
+**Navigation multiple et persistance d'état :**
+
+- Redirections cohérentes sur tentatives multiples : on vérifie qu'avec un utilisateur connecté, plusieurs tentatives de navigation vers `/login` et `/register` sont toutes redirigées vers `/rentals`, que `sessionService.isLogged` reste à `true` après chaque redirection, que le comportement est consistant
+
+**Préservation de l'état SessionService durant les redirections :**
+
+- Intégrité de la session après redirections : on vérifie qu'après connexion d'un utilisateur et plusieurs redirections, `sessionService.isLogged` reste à `true`, que `sessionService.sessionInformation` est préservé intact, que le token et les informations utilisateur ne sont pas altérés par les redirections, que la session reste stable malgré les tentatives de navigation
+
+**Nombre de tests :** 7 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent `RouterTestingModule` avec de vraies routes et composants mockés pour valider l'intégration complète entre `UnauthGuard`, `Router`, `Location`, et `SessionService`, reproduisant fidèlement les flux de redirection inverse (empêcher l'accès aux pages publiques pour utilisateurs connectés) en production.
+
+
+
+---
+
+# Interceptors
+
+## `front\src\app\interceptors\jwt.interceptor.integration.spec.ts`
+
+ Différence avec les tests unitaires :
+ * Test avec HttpClient RÉEL (pas de mocks complets)
+ * SessionService RÉEL pour l'état utilisateur partagé
+ * Pipeline HTTP complet avec intercepteur en conditions réelles
+ * Validation de l'injection de token sur requêtes simultanées
+#### Teste `JwtInterceptor` (Tests d'intégration)
+
+**Description :** Tests d'intégration de l'intercepteur JWT - Validation de l'injection automatique du token avec HttpClient et SessionService réels
+
+**Tests :**
+
+**Injection automatique du token JWT pour utilisateur connecté :**
+
+- Intégration complète de sécurité avec services réels : on vérifie qu'après connexion d'un utilisateur via `SessionService.logIn()`, toutes les requêtes HTTP via `HttpClient` incluent automatiquement le header `Authorization`, que le format du token est correct (`Bearer integration-jwt-token`), que l'intercepteur fonctionne de manière transparente pour l'application
+
+**Aucune injection de token pour utilisateur non connecté :**
+
+- Requêtes publiques sans authentification : on vérifie qu'avec un utilisateur non connecté (`sessionService.isLogged = false`), les requêtes HTTP (comme `/api/auth/login`) n'incluent pas de header `Authorization`, que les endpoints publics restent accessibles sans token
+
+**Injection de token sur différents verbes HTTP :**
+
+- Fonctionnement avec toutes les méthodes HTTP : on vérifie qu'avec un utilisateur connecté, l'intercepteur injecte le token pour GET, POST, PUT, DELETE, PATCH, que chaque méthode HTTP reçoit correctement le header `Authorization: Bearer all-methods-token`, que tous les endpoints CRUD sont sécurisés automatiquement
+
+**Requêtes simultanées avec injection cohérente :**
+
+- Gestion de requêtes en parallèle : on vérifie qu'avec plusieurs requêtes simultanées (`/api/sessions`, `/api/teachers`, `/api/user/3`, `/api/sessions/1`), toutes reçoivent le même token JWT de manière cohérente, que l'intercepteur fonctionne correctement sous charge
+
+**Changement d'état de session pendant le cycle de vie des requêtes :**
+
+- Adaptation dynamique aux modifications d'authentification : on vérifie qu'en Phase 1 (non connecté), les requêtes vers `/api/public` n'ont pas de header Authorization, qu'en Phase 2 après connexion, les requêtes vers `/api/protected` incluent le token, qu'en Phase 3 après déconnexion, les requêtes publiques n'ont à nouveau plus de token, que l'intercepteur s'adapte en temps réel aux changements d'état
+
+**Préservation des headers existants :**
+
+- Intégration sans conflit avec headers personnalisés : on vérifie que l'intercepteur ajoute `Authorization` sans écraser les headers existants (`Content-Type`, `X-Custom-Header`), que tous les headers coexistent correctement, que les requêtes avec headers personnalisés fonctionnent normalement
+
+**Validation avec différents types de tokens :**
+
+- Fonctionnement avec formats de token variés : on vérifie que l'intercepteur fonctionne avec des tokens courts (`short-token-123`), que les tokens JWT longs (format standard) sont correctement gérés, que le type de token (`Bearer`) est préservé, que différents formats de tokens peuvent être utilisés successivement
+
+**Nombre de tests :** 7 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent `HttpClientModule` et `HttpClientTestingModule` avec de vrais services (`HttpClient`, `SessionService`) pour valider l'intégration complète de l'intercepteur dans l'architecture de sécurité de l'application, reproduisant fidèlement les conditions de production avec injection automatique du JWT sur toutes les requêtes API.
+
+
+---
+
+# Services
+
+## `front\src\app\services\session.service.integration.spec.ts`
+
+Différence avec les tests unitaires :
+ * Test avec des observables RÉELS et leurs souscriptions
+ * Validation de la synchronisation d'état en temps réel
+ * Test des effets de bord sur l'état global
+ * Simulation de l'utilisation réelle par multiple composants
+
+#### Teste `SessionService` (Tests d'intégration)
+
+**Description :** Tests d'intégration du service de session - Validation de l'état global et des observables avec service réel
+
+**Tests :**
+
+**Création du service :**
+
+- Le service doit être créé correctement
+
+**Synchronisation état + observable en temps réel :**
+
+- Intégration complète entre état et réactivité : on vérifie qu'à l'état initial, l'observable `$isLogged()` émet `false` et `sessionInformation` est `undefined`, qu'après `logIn()`, l'observable émet `true` et les données de session sont définies, qu'après `logOut()`, l'observable émet `false` et les données sont nettoyées, que l'historique complet des émissions est `[false, true, false]`, que chaque changement d'état déclenche immédiatement une émission
+
+**Multiples souscriptions simultanées :**
+
+- Gestion de plusieurs composants abonnés : on vérifie que 3 composants simultanés (simulés par 3 souscriptions) reçoivent tous les mêmes émissions, que chaque souscription capture correctement `[false, true, false]`, que les émissions sont synchrones entre tous les abonnés, que le service gère efficacement plusieurs observateurs
+
+**Intégrité des données de session :**
+
+- Maintien de la cohérence des données pendant le cycle de vie : on vérifie qu'à l'état initial, aucune donnée de session n'est présente, qu'après connexion, toutes les propriétés utilisateur sont intègres (token complet, id, username, firstName, lastName, admin), que l'objet sessionInformation est une copie (pas une référence), qu'après déconnexion, toutes les données sont complètement nettoyées
+
+**Performance avec volume élevé de souscriptions :**
+
+- Gestion efficace de nombreuses souscriptions : on vérifie qu'avec 10 souscriptions simultanées (simulant une application complexe), chaque souscription reçoit exactement 3 émissions (`false → true → false`), qu'aucune perte d'émission n'occurre, que toutes les souscriptions sont correctement nettoyées après usage, que les performances restent stables
+
+**Cohérence d'état avec opérations rapides successives :**
+
+- Maintien de la cohérence lors de changements d'état rapides : on vérifie qu'avec une séquence rapide (login → logout → login → logout → login), la séquence d'émissions est correcte `[false, true, false, true, false, true]`, que chaque changement d'utilisateur est correctement capturé (rapid1, rapid2, rapid3), que les données de session correspondent à chaque étape, que le service maintient la cohérence même sous stress
+
+**Souscription tardive (Late subscription) :**
+
+- Fourniture immédiate de l'état actuel aux nouveaux abonnés : on vérifie qu'après établissement d'une session active, un nouveau souscripteur reçoit immédiatement l'état actuel (`true`), que les données de session courantes sont accessibles (`username: 'late@test.com'`), que les souscriptions tardives ne ratent pas l'état établi
+
+**Nombre de tests :** 7 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent le vrai `SessionService` avec ses observables RxJS pour valider l'intégration complète de l'état global de l'application, la réactivité en temps réel, et la cohérence entre les propriétés synchrones (`isLogged`, `sessionInformation`) et asynchrones (`$isLogged()` Observable), reproduisant fidèlement le comportement de gestion d'état en production.
+
+
+## `front\src\app\services\teacher.service.integration.spec.ts`
+
+ Différence avec les tests unitaires :
+ * Test avec HttpClient RÉEL pour valider l'intégration réseau complète
+ * Validation des structures de données Teacher complètes
+ * Test des conditions d'erreur métier (professeur non trouvé, etc.)
+ * Vérification de la cohérence des données référentielles
+
+#### Teste `TeacherService` (Tests d'intégration)
+
+**Description :** Tests d'intégration du service des professeurs - Validation des opérations avec vraies requêtes HTTP
+
+**Tests :**
+
+**Création du service :**
+
+- Le service doit être créé correctement
+
+**Récupération de tous les professeurs avec données complètes :**
+
+- Intégration pour formulaire de création de session : on vérifie qu'une requête HTTP GET est envoyée vers `api/teacher`, que la liste complète des professeurs est retournée (4 professeurs), que toutes les propriétés sont présentes et du bon type (id: number, firstName/lastName: string, dates: Date), que les données spécifiques sont correctes (Marie Dubois avec id: 1), que la structure est cohérente pour la sélection de professeur
+
+**Récupération des détails d'un professeur spécifique :**
+
+- Intégration pour affichage dans les détails de session : on vérifie qu'une requête HTTP GET est envoyée vers `api/teacher/{id}`, que toutes les propriétés du professeur sont retournées (Pierre Martin, id: 2), que les timestamps sont des instances Date valides, que l'intégrité des dates est maintenue (createdAt < updatedAt)
+
+**Gestion des professeurs avec noms complexes et caractères spéciaux :**
+
+- Intégration avec données réelles complexes : on vérifie que les noms composés sont préservés (`Marie-Claire`, `Jean-François`), que les caractères spéciaux sont correctement gérés (`De La Rosa-Martinez`, `O'Sullivan`, `Müller-Schmidt`), que les accents et apostrophes sont intacts, que l'encodage UTF-8 fonctionne correctement
+
+**Gestion des cas limites (liste vide) :**
+
+- Continuité métier avec données edge-case : on vérifie qu'une liste vide de professeurs est correctement gérée, que le retour est un tableau vide valide `[]`, que `Array.isArray()` retourne `true`, que l'application peut fonctionner sans professeurs disponibles
+
+**Gestion des erreurs métier (professeur non trouvé) :**
+
+- Intégrité de l'affichage des sessions : on vérifie qu'avec un ID inexistant (`999`), une erreur HTTP 404 (Not Found) est correctement propagée, que le message "Teacher not found" est récupérable, que les détails d'erreur sont complets pour le debugging
+
+**Performance avec grande liste de professeurs :**
+
+- Validation de scalabilité : on vérifie qu'avec 50 professeurs (simulation grande école), tous les objets ont la structure correcte, que les IDs sont séquentiels (1 à 50), que les noms sont générés correctement (`Professeur1`, `Nom1`), que les performances restent acceptables
+
+**Requêtes simultanées pour différents professeurs :**
+
+- Gestion de sessions multiples en parallèle : on vérifie qu'avec 4 requêtes simultanées vers différents professeurs, toutes les requêtes HTTP GET sont envoyées correctement, que chaque URL est bien formée (`api/teacher/{id}`), que les réponses sont correctement associées à chaque requête
+
+**Validation de la cohérence des timestamps :**
+
+- Sérialisation/désérialisation correcte : on vérifie que les timestamps précis sont préservés (millisecondes incluses), que les dates sont des instances Date valides, que la logique métier est respectée (createdAt antérieur à updatedAt), que l'ISO string est exact
+
+**Validation de la cohérence des endpoints API :**
+
+- Structure uniforme des URLs : on vérifie que toutes les opérations utilisent la base `api/teacher`, que les URLs sont bien formées (`api/teacher`, `api/teacher/1`, `api/teacher/25`), que toutes les méthodes HTTP sont GET, que la structure est prévisible et cohérente
+
+**Gestion des erreurs réseau :**
+
+- Continuité de service lors de problèmes de connectivité : on vérifie qu'une erreur réseau génère un status 0, que les erreurs de connectivité sont distinguées des erreurs serveur, que le service reste robuste face aux pannes réseau
+
+**Nombre de tests :** 11 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent `HttpClientTestingModule` pour simuler de vraies requêtes HTTP et valident l'intégration complète du service avec l'API backend, incluant la gestion des données référentielles (professeurs), des caractères spéciaux, et des scénarios de performance réalistes pour une application de yoga.
+
+
+## `front\src\app\services\user.service.integration.spec.ts`
+
+ Différence avec les tests unitaires :
+ * Test avec HttpClient RÉEL pour valider l'intégration réseau complète
+ * Validation des structures de données User complètes avec informations sensibles
+ * Test des conditions d'erreur de sécurité (accès non autorisé, etc.)
+ * Vérification de la protection des données personnelles
+
+#### Teste `UserService` (Tests d'intégration)
+
+**Description :** Tests d'intégration du service utilisateur - Validation des opérations de gestion de profil avec vraies requêtes HTTP
+
+**Tests :**
+
+**Création du service :**
+
+- Le service doit être créé correctement
+
+**Récupération complète des données utilisateur :**
+
+- Intégration pour affichage du profil complet : on vérifie qu'une requête HTTP GET est envoyée vers `api/user/{id}`, que toutes les propriétés utilisateur sont retournées (id, email, firstName, lastName, admin, password, dates), que les timestamps sont des instances Date valides avec logique temporelle (createdAt < updatedAt), que le mot de passe est haché côté serveur (sécurité), que l'intégrité des données est maintenue
+
+**Récupération des données d'un utilisateur administrateur :**
+
+- Intégration avec privilèges admin : on vérifie que les données admin sont correctement récupérées (`admin: true`), que l'email contient "admin", que les propriétés spécifiques admin sont cohérentes (firstName: Admin, lastName: Yoga), que les privilèges sont correctement identifiés
+
+**Suppression de compte utilisateur (opération critique) :**
+
+- Processus complet de suppression avec sécurité : on vérifie qu'une requête HTTP DELETE est envoyée vers `api/user/{id}`, que le corps de la requête est null (DELETE standard), que la confirmation de suppression est retournée, que l'opération irréversible est correctement validée
+
+**Gestion des erreurs de sécurité (accès non autorisé) :**
+
+- Protection contre l'accès aux données d'autres utilisateurs : on vérifie qu'avec un ID non autorisé, une erreur HTTP 403 (Forbidden) est correctement propagée, que le message "Access denied" est retourné, que la sécurité des données personnelles est respectée
+
+**Gestion des erreurs utilisateur non trouvé :**
+
+- Validation avec utilisateur inexistant : on vérifie qu'avec un ID inexistant (`99999`), une erreur HTTP 404 (Not Found) est correctement gérée, que le message "User not found" est récupérable, que les cas limites sont traités proprement
+
+**Protection contre la suppression de compte admin :**
+
+- Validation des règles métier pour comptes critiques : on vérifie qu'avec tentative de suppression d'un compte admin, une erreur HTTP 422 (Unprocessable Entity) est générée, que le message "Cannot delete admin account" est retourné, que les règles business critiques sont respectées
+
+**Gestion des utilisateurs avec données complexes :**
+
+- Intégration avec emails et noms complexes : on vérifie que les emails avec caractères spéciaux (`marie-claire.dubois+yoga@domaine-test.fr`) sont préservés, que les noms composés (`Marie-Claire`, `Dubois-Martin`) sont correctement gérés, que l'encodage UTF-8 fonctionne avec tous les caractères spéciaux
+
+**Validation des timestamps et cohérence temporelle :**
+
+- Gestion correcte des dates dans l'API : on vérifie que les timestamps précis sont préservés (millisecondes incluses), que la logique temporelle est respectée (createdAt antérieur à updatedAt), que les dates ne sont pas dans le futur, que la sérialisation ISO string est exacte
+
+**Opérations simultanées sur différents utilisateurs :**
+
+- Scénarios multi-utilisateurs en parallèle : on vérifie qu'avec plusieurs requêtes simultanées (2 GET, 1 DELETE), toutes les requêtes HTTP sont envoyées correctement, que chaque méthode HTTP correspond à l'opération (GET pour récupération, DELETE pour suppression), que les réponses sont correctement associées
+
+**Validation de la cohérence des endpoints API :**
+
+- Structure uniforme pour toutes les opérations utilisateur : on vérifie que tous les endpoints (`getById`, `delete`) utilisent la base `api/user/{id}`, que les URLs suivent le pattern regex `/^api\/user\/\d+$/`, que les méthodes HTTP correspondent aux opérations CRUD
+
+**Gestion des erreurs réseau :**
+
+- Continuité des opérations lors de problèmes de connectivité : on vérifie qu'une erreur réseau génère un status 0, que les erreurs de connectivité sont distinguées des erreurs serveur, que le service reste robuste face aux pannes réseau
+
+**Nombre de tests :** 12 tests
+
+**Spécificité - Tests d'intégration :**  
+Ces tests utilisent `HttpClientTestingModule` pour simuler de vraies requêtes HTTP et valident l'intégration complète du service avec l'API backend, incluant la gestion des données personnelles sensibles, la sécurité d'accès, et les règles métier critiques (protection des comptes admin, suppression irréversible).
+
+
+---

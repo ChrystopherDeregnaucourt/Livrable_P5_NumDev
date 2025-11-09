@@ -1,0 +1,157 @@
+## Structure des tests
+
+### 1. `login.cy.ts` - Tests de connexion
+
+- Affichage du formulaire de connexion
+
+- Connexion réussie avec des identifiants valides
+
+- Gestion des erreurs avec des identifiants invalides
+
+- Validation du formulaire (bouton désactivé si formulaire invalide)
+
+- Navigation vers la page d'inscription
+
+  
+
+### 2. `register.cy.ts` - Tests d'inscription
+
+- Affichage du formulaire d'inscription
+
+- Inscription réussie avec des données valides
+
+- Gestion des erreurs (email déjà existant)
+
+- Validation du formulaire (tous les champs requis)
+
+- Navigation vers la page de connexion
+
+  
+
+### 3. `sessions.cy.ts` - Tests de gestion des sessions
+
+#### Liste des sessions
+
+- Affichage de la liste des sessions
+
+- Bouton de création visible pour les administrateurs
+
+- Navigation vers le détail d'une session
+
+- Navigation vers la création de session
+
+  
+
+#### Détail d'une session
+
+- Affichage des informations détaillées
+
+- Suppression de session (admin uniquement)
+
+- Navigation retour vers la liste
+
+  
+
+#### Création de session
+
+- Affichage du formulaire de création
+
+- Création réussie d'une session
+
+- Validation des champs requis
+
+  
+
+#### Mise à jour de session
+
+- Affichage du formulaire avec les données existantes
+
+- Mise à jour réussie d'une session
+
+  
+
+#### Participation aux sessions
+
+- Participation d'un utilisateur à une session
+
+- Désinscription d'un utilisateur d'une session
+
+  
+
+### 4. `me.cy.ts` - Tests du profil utilisateur
+
+- Affichage des informations du profil administrateur
+
+- Affichage des informations du profil utilisateur
+
+- Navigation retour depuis le profil
+
+- Suppression de compte utilisateur (non-admin uniquement)
+
+- Vérification que le bouton de suppression n'apparaît pas pour les admins
+
+  
+
+### 5. `logout.cy.ts` - Tests de déconnexion
+
+- Déconnexion réussie
+
+- Effacement de la session et redirection vers login
+
+- Protection des routes après déconnexion
+
+- Masquage du bouton de déconnexion pour les utilisateurs non connectés
+
+  
+
+### 6. `navigation.cy.ts` - Tests de navigation
+
+#### Navigation non authentifiée
+
+- Redirection vers login lors de l'accès à des routes protégées
+
+- Affichage des liens login et register
+
+- Navigation entre login et register
+
+- Redirection vers 404 pour les routes inconnues
+
+  
+
+#### Navigation authentifiée
+
+- Affichage des éléments de navigation authentifiés
+
+- Navigation vers les sessions
+
+- Navigation vers le compte
+
+- Impossibilité d'accéder aux pages login/register quand connecté
+
+  
+
+#### Navigation par titre de l'application
+
+- Retour à la page d'accueil appropriée selon l'état de connexion
+
+  
+
+### 7. `complete-workflow.cy.ts` - Tests de workflows complets
+
+#### Parcours utilisateur complet
+
+- Inscription → Connexion → Consultation sessions → Participation → Profil → Déconnexion
+
+  
+
+#### Parcours administrateur complet
+
+- Connexion → Création session → Modification → Suppression → Profil → Déconnexion
+
+  
+
+#### Workflow de participation
+
+- Participation à plusieurs sessions
+
+- Désinscription de sessions
