@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "start": "ng serve",
+    "serve-coverage": "ng run yoga:serve-coverage",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:unit": "jest --testPathIgnorePatterns=integration",
@@ -13,7 +14,7 @@
     "e2e:coverage": "npx nyc report --reporter=lcov --reporter=text-summary",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "cypress:test": "start-server-and-test start http://localhost:4200 cypress:run"
+    "cypress:test": "start-server-and-test serve-coverage http://localhost:4200 cypress:run"
   },
   "private": true,
   "dependencies": {
@@ -52,7 +53,7 @@
     "@types/node": "^18.19.130",
     "@typescript-eslint/eslint-plugin": "5.35.1",
     "@typescript-eslint/parser": "5.35.1",
-    "cypress": "^10.4.0",
+    "cypress": "^10.11.0",
     "eslint": "8.23.0",
     "istanbul-lib-coverage": "3.2.0",
     "jest": "28.1.3",

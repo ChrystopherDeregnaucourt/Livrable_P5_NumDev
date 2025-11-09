@@ -332,10 +332,26 @@ describe('Sessions spec', () => {
         },
       }).as('loginUserRequest');
 
+      cy.intercept('GET', '/api/session', {
+        body: [
+          {
+            id: 1,
+            name: 'Morning Yoga',
+            description: 'Start your day with energy',
+            date: '2024-12-01T08:00:00',
+            teacher_id: 1,
+            users: [],
+            createdAt: '2024-11-01T00:00:00',
+            updatedAt: '2024-11-01T00:00:00'
+          }
+        ]
+      }).as('sessionsRequest');
+
       cy.visit('/login');
       cy.get('input[formControlName=email]').clear().type("user@test.com");
       cy.get('input[formControlName=password]').clear().type("test!1234{enter}{enter}");
       cy.wait('@loginUserRequest');
+      cy.wait('@sessionsRequest');
     });
 
     // Vérifie qu'un utilisateur peut participer à une session

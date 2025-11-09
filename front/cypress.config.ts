@@ -7,8 +7,8 @@ export default defineConfig({
   video: false,
   e2e: {
     setupNodeEvents(on, config) {
-      // Code coverage configuration (optional)
-      // Uncomment if needed: require('@cypress/code-coverage/task')(on, config)
+      // Code coverage configuration
+      require('@cypress/code-coverage/task')(on, config)
       return config
     },
     baseUrl: 'http://localhost:4200',
