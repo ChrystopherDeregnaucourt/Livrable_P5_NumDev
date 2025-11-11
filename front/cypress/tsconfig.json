@@ -1,9 +1,16 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "isolatedModules": false
+    "target": "es6",
+    "lib": ["es6", "dom"],
+    "types": ["cypress", "node"],
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": [
-    "../node_modules/cypress"
+    "**/*.ts",
+    "../cypress.d.ts"
   ]
 }

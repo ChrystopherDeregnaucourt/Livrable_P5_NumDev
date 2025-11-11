@@ -3,14 +3,18 @@
   "version": "0.0.0",
   "scripts": {
     "start": "ng serve",
+    "serve-coverage": "ng run yoga:serve-coverage",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:unit": "jest --testPathIgnorePatterns=integration",
+    "test:integration": "jest --testPathPattern=integration",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "e2e:ci": "ng run yoga:e2e-ci",
     "e2e:coverage": "npx nyc report --reporter=lcov --reporter=text-summary",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "cypress:test": "start-server-and-test serve-coverage http://localhost:4200 cypress:run"
   },
   "private": true,
   "dependencies": {
@@ -30,8 +34,8 @@
     "zone.js": "0.11.8"
   },
   "devDependencies": {
-    "@angular-builders/jest": "14.0.1",
     "@angular-builders/custom-webpack": "^14.0.1",
+    "@angular-builders/jest": "14.0.1",
     "@angular-devkit/build-angular": "14.2.1",
     "@angular-eslint/builder": "14.0.3",
     "@angular-eslint/eslint-plugin": "14.0.3",
@@ -46,15 +50,18 @@
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
     "@types/jest": "28.1.3",
+    "@types/node": "^18.19.130",
     "@typescript-eslint/eslint-plugin": "5.35.1",
     "@typescript-eslint/parser": "5.35.1",
-    "cypress": "10.4.0",
+    "cypress": "^10.11.0",
     "eslint": "8.23.0",
     "istanbul-lib-coverage": "3.2.0",
     "jest": "28.1.3",
     "jest-html-reporter": "3.6.0",
     "jest-marbles": "3.0.3",
+    "jest-preset-angular": "^12.2.6",
     "nyc": "15.1.0",
+    "start-server-and-test": "^2.1.2",
     "typescript": "4.7.4",
     "webpack": "5.74.0"
   }

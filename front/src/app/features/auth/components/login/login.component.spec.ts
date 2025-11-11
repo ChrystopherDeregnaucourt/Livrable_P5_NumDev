@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -17,13 +19,13 @@ import { LoginComponent } from './login.component';
 /**
  * TESTS CRITIQUES - LoginComponent
  * 
- * JUSTIFICATION : Ces tests sont ESSENTIELS car ils couvrent :
+Ces tests couvrent :
  * 1. POINT D'ENTRÉE : Login = point d'accès principal de l'application
  * 2. SÉCURITÉ UI : Validation côté client avant appel API auth
  * 3. GESTION ERREURS : Affichage erreurs de connexion pour l'utilisateur
  * 4. NAVIGATION : Redirection correcte après authentification réussie
  * 
- * Réduit volontairement : Validation détaillée testée en E2E pour l'UX complète
+ * Réduit car : Validation détaillée testée en E2E pour l'UX complète
  */
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -33,7 +35,6 @@ describe('LoginComponent', () => {
   let mockRouter: Partial<Router>;
 
   beforeEach(async () => {
-    // Création des mocks avec Jest
     const authServiceSpy = {
       login: jest.fn(),
       register: jest.fn()
@@ -68,7 +69,6 @@ describe('LoginComponent', () => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     
-    // Récupération des mocks
     mockAuthService = TestBed.inject(AuthService) as Partial<AuthService>;
     mockSessionService = TestBed.inject(SessionService) as Partial<SessionService>;
     mockRouter = TestBed.inject(Router) as Partial<Router>;
@@ -82,20 +82,27 @@ describe('LoginComponent', () => {
 
   describe('Form validation', () => {
     it('should initialize with invalid form', () => {
-      // Le formulaire doit être invalide au début (champs vides)
+      
+      // Assert
       expect(component.form.valid).toBeFalsy();
     });
 
     it('should require email field', () => {
-      // Test de validation du champ email
+      // Arrange
       const emailControl = component.form.get('email');
+      
+      // Assert
+      // Test de validation du champ email
       expect(emailControl?.valid).toBeFalsy();
       
       // Email requis
       expect(emailControl?.errors?.['required']).toBeTruthy();
       
+      // Arrange
       // Email valide
       emailControl?.setValue('test@test.com');
+      
+      // Assert
       expect(emailControl?.errors?.['required']).toBeFalsy();
       expect(emailControl?.valid).toBeTruthy();
     });
@@ -105,7 +112,7 @@ describe('LoginComponent', () => {
 
   describe('submit', () => {
     it('should login successfully and navigate to sessions', () => {
-      // Données de test
+      // Arrange
       const mockSessionInfo: SessionInformation = {
         token: 'test-token',
         type: 'Bearer',
@@ -116,7 +123,6 @@ describe('LoginComponent', () => {
         admin: false
       };
 
-      // Configuration des mocks
       (mockAuthService.login as jest.Mock).mockReturnValue(of(mockSessionInfo));
 
       // Remplir le formulaire
@@ -125,10 +131,11 @@ describe('LoginComponent', () => {
         password: 'password123'
       });
 
+      // Act
       // Appeler submit
       component.submit();
 
-      // Vérifications
+      // Assert
       expect(mockAuthService.login as jest.Mock).toHaveBeenCalledWith({
         email: 'test@test.com',
         password: 'password123'
@@ -139,6 +146,7 @@ describe('LoginComponent', () => {
     });
 
     it('should handle login error', () => {
+      // Arrange
       // Simuler une erreur de connexion
       (mockAuthService.login as jest.Mock).mockReturnValue(throwError(() => new Error('Invalid credentials')));
 
@@ -148,10 +156,11 @@ describe('LoginComponent', () => {
         password: 'wrongpassword'
       });
 
+      // Act
       // Appeler submit
       component.submit();
 
-      // Vérifications
+      // Assert
       expect(mockAuthService.login as jest.Mock).toHaveBeenCalled();
       expect(mockSessionService.logIn as jest.Mock).not.toHaveBeenCalled();
       expect(mockRouter.navigate as jest.Mock).not.toHaveBeenCalled();
@@ -159,6 +168,7 @@ describe('LoginComponent', () => {
     });
 
     it('should connect after error state on successful login', () => {
+      // Arrange
       // D'abord simuler une erreur
       component.onError = true;
 
@@ -179,8 +189,10 @@ describe('LoginComponent', () => {
         password: 'password123'
       });
 
+      // Act
       component.submit();
 
+      // Assert
       // L'erreur ne doit pas être réinitialisée automatiquement dans ce cas
       // mais la connexion doit fonctionner
       expect(mockSessionService.logIn as jest.Mock).toHaveBeenCalledWith(mockSessionInfo);
@@ -188,6 +200,7 @@ describe('LoginComponent', () => {
     });
 
     it('should work with admin user login', () => {
+      // Arrange
       const mockAdminSessionInfo: SessionInformation = {
         token: 'admin-token',
         type: 'Bearer',
@@ -205,8 +218,10 @@ describe('LoginComponent', () => {
         password: 'adminpass'
       });
 
+      // Act
       component.submit();
 
+      // Assert
       expect(mockAuthService.login as jest.Mock).toHaveBeenCalledWith({
         email: 'admin@test.com',
         password: 'adminpass'
@@ -219,35 +234,48 @@ describe('LoginComponent', () => {
   //**********************Demander à Charles si les tests sont necessaires**********************
   describe('Password visibility toggle', () => {
     it('should initialize with password hidden', () => {
+      // Assert
       // Le mot de passe doit être masqué par défaut
       expect(component.hide).toBeTruthy();
     });
 
     it('should toggle password visibility', () => {
+      // Arrange
       // Test de la fonctionnalité de basculement de visibilité
       const initialHideState = component.hide;
       
+      // Act
       // Simuler le clic sur l'icône de basculement
       component.hide = !component.hide;
+      
+      // Assert
       expect(component.hide).toBe(!initialHideState);
       
+      // Act
       // Basculer à nouveau
       component.hide = !component.hide;
+      
+      // Assert
       expect(component.hide).toBe(initialHideState);
     });
   });
 
   describe('Error handling', () => {
     it('should display error message when onError is true', () => {
+      // Arrange
       // Définir l'état d'erreur
       component.onError = true;
+      
+      // Act
       fixture.detectChanges();
 
+      // Assert
       // L'état d'erreur doit être accessible pour l'affichage dans le template
       expect(component.onError).toBeTruthy();
     });
 
     it('should start without error message', () => {
+      // Assert
       // Aucune erreur au début
       expect(component.onError).toBeFalsy();
     });

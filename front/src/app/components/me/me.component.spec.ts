@@ -1,5 +1,7 @@
+/// <reference types="jest" />
+
 import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,33 +17,26 @@ import { MeComponent } from './me.component';
 /**
  * Tests du composant MeComponent - Page de profil utilisateur
  * 
- * IMPORTANCE CRITIQUE : Sécurité ⭐⭐⭐⭐⭐
- * 
  * Ce composant gère des fonctionnalités sensibles :
  * - Affichage des informations personnelles de l'utilisateur
- * - Suppression de compte (action irréversible)
+ * - Suppression de compte
  * - Contrôle d'accès basé sur l'utilisateur connecté
  * 
- * TESTS ESSENTIELS :
+ * TESTS :
  * 1. Chargement correct des données utilisateur au ngOnInit
  * 2. Navigation retour vers la liste des sessions
  * 3. Processus de suppression de compte avec confirmation
  * 4. Vérification de l'autorisation (utilisateur ne peut supprimer que son propre compte)
  * 5. Déconnexion automatique après suppression
- * 
- * RISQUES SI NON TESTÉ :
- * - Suppression de compte d'un autre utilisateur
- * - Perte de données sans confirmation
- * - Session non fermée après suppression
- * - Affichage d'informations erronées
  */
+
 describe('MeComponent', () => {
   let component: MeComponent;
   let fixture: ComponentFixture<MeComponent>;
-  let mockUserService: jest.Mocked<UserService>;
+  let mockUserService: jest.Mocked<Partial<UserService>>;
   let mockSessionService: Partial<SessionService>;
-  let mockRouter: jest.Mocked<Router>;
-  let mockMatSnackBar: jest.Mocked<MatSnackBar>;
+  let mockRouter: jest.Mocked<Partial<Router>>;
+  let mockMatSnackBar: jest.Mocked<Partial<MatSnackBar>>;
 
   const mockUser: User = {
     id: 1,
@@ -59,7 +54,7 @@ describe('MeComponent', () => {
     mockUserService = {
       getById: jest.fn().mockReturnValue(of(mockUser)),
       delete: jest.fn().mockReturnValue(of({}))
-    } as any;
+    } as jest.Mocked<Partial<UserService>>;
 
     // Mock SessionService
     mockSessionService = {
@@ -79,12 +74,12 @@ describe('MeComponent', () => {
     // Mock Router
     mockRouter = {
       navigate: jest.fn()
-    } as any;
+    } as jest.Mocked<Partial<Router>>;
 
     // Mock MatSnackBar
     mockMatSnackBar = {
       open: jest.fn()
-    } as any;
+    } as jest.Mocked<Partial<MatSnackBar>>;
 
     await TestBed.configureTestingModule({
       declarations: [MeComponent],
@@ -108,26 +103,19 @@ describe('MeComponent', () => {
     component = fixture.componentInstance;
   });
 
-  /**
-   * Test de création du composant
-   * Vérifie que le composant peut être instancié correctement
-   */
+  //Test de création du composant
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   /**
    * Tests du cycle de vie ngOnInit
-   * 
-   * IMPORTANCE : ⭐⭐⭐⭐⭐
    * Valide que les données utilisateur sont chargées correctement au démarrage
    * Essentiel pour afficher les bonnes informations personnelles
    */
-  describe('ngOnInit', () => {
-    /**
-     * Vérifie le chargement automatique des informations utilisateur
-     * Test fondamental : garantit que le profil affiché correspond à l'utilisateur connecté
-     */
+  describe('Test call ngOnInit', () => {
+
+    //Vérifie le chargement automatique des informations utilisateur: garantit que le profil affiché correspond à l'utilisateur connecté
     it('should load user information on initialization', () => {
       // Act
       fixture.detectChanges(); // Déclenche ngOnInit
@@ -146,7 +134,7 @@ describe('MeComponent', () => {
       mockSessionService.sessionInformation!.id = 42;
 
       // Act
-      component.ngOnInit();
+      fixture.detectChanges(); // Déclenche ngOnInit
 
       // Assert
       expect(mockUserService.getById).toHaveBeenCalledWith('42');
@@ -157,7 +145,7 @@ describe('MeComponent', () => {
    * Tests de navigation
    * Vérifie le fonctionnement du bouton retour
    */
-  describe('back', () => {
+  describe('call back', () => {
     /**
      * Vérifie que le bouton retour utilise l'historique du navigateur
      * UX : comportement attendu par l'utilisateur
@@ -176,11 +164,7 @@ describe('MeComponent', () => {
 
   /**
    * Tests de suppression de compte
-   * 
-   * IMPORTANCE CRITIQUE : ⭐⭐⭐⭐⭐
-   * Action irréversible qui supprime définitivement les données utilisateur
-   * 
-   * SÉCURITÉ :
+   *
    * - Doit vérifier l'autorisation (utilisateur ne peut supprimer que son propre compte)
    * - Doit déconnecter l'utilisateur après suppression
    * - Doit rediriger vers la page d'accueil
@@ -189,32 +173,24 @@ describe('MeComponent', () => {
   describe('delete', () => {
     /**
      * Scénario nominal : suppression réussie d'un compte
-     * Valide la séquence complète : API → Déconnexion → Message → Redirection
+     * Valide la séquence complète : API, Déconnexion, Message et Redirection
      */
-    it('should delete user account successfully', (done) => {
+    it('should delete user account successfully', fakeAsync(() => {
       // Act
       component.delete();
+      flush(); // Force l'exécution immédiate des observables
 
       // Assert
-      setTimeout(() => {
-        // Vérification de l'appel API avec le bon ID utilisateur
-        expect(mockUserService.delete).toHaveBeenCalledWith('1');
-        
-        // Vérification du message de confirmation (feedback utilisateur)
-        expect(mockMatSnackBar.open).toHaveBeenCalledWith(
-          'Your account has been deleted !',
-          'Close',
-          { duration: 3000 }
-        );
-        
-        // SÉCURITÉ : Vérification de la déconnexion (session fermée après suppression)
-        expect(mockSessionService.logOut).toHaveBeenCalled();
-        
-        // Vérification de la redirection vers la page d'accueil
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
-        done();
-      }, 100);
-    });
+      // La fonction delete est appelée avec l'ID utilisateur
+      expect(mockUserService.delete).toHaveBeenCalledWith('1');
+      expect(mockMatSnackBar.open).toHaveBeenCalledWith(
+        'Your account has been deleted !',
+        'Close',
+        { duration: 3000 }
+      );
+      expect(mockSessionService.logOut).toHaveBeenCalled();
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+    }));
 
     /**
      * Vérifie l'utilisation du bon ID utilisateur pour la suppression
@@ -235,17 +211,15 @@ describe('MeComponent', () => {
      * Vérifie l'ordre d'exécution : déconnexion puis redirection
      * SÉCURITÉ : l'utilisateur ne doit pas rester connecté après suppression de son compte
      */
-    it('should logout and redirect after successful deletion', (done) => {
+    it('should logout and redirect after successful deletion', fakeAsync(() => {
       // Act
       component.delete();
+      flush(); // Force l'exécution immédiate des observables
 
       // Assert - vérifie l'ordre d'exécution
-      setTimeout(() => {
-        expect(mockSessionService.logOut).toHaveBeenCalled();
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
-        done();
-      }, 100);
-    });
+      expect(mockSessionService.logOut).toHaveBeenCalled();
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+    }));
   });
 
   /**

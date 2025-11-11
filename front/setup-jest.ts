@@ -14,7 +14,10 @@ const mock = () => {
 Object.defineProperty(window, 'localStorage', { value: mock() });
 Object.defineProperty(window, 'sessionStorage', { value: mock() });
 Object.defineProperty(window, 'getComputedStyle', {
-  value: () => ['-webkit-appearance'],
+  value: () => ({
+    getPropertyValue: jest.fn().mockReturnValue(''),
+    '-webkit-appearance': 'none'
+  }),
 });
 
 Object.defineProperty(document.body.style, 'transform', {
@@ -24,6 +27,21 @@ Object.defineProperty(document.body.style, 'transform', {
       configurable: true,
     };
   },
+});
+
+// Mock window.matchMedia pour @angular/flex-layout
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), 
+    removeListener: jest.fn(), 
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
 });
 
 /* output shorter and more meaningful Zone error stack traces */

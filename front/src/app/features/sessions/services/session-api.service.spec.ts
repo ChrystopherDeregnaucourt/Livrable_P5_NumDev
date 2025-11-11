@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { expect } from '@jest/globals';
@@ -5,15 +7,13 @@ import { Session } from '../interfaces/session.interface';
 import { SessionApiService } from './session-api.service';
 
 /**
- * TESTS CRITIQUES - SessionApiService (CRUD uniquement)
+ * TESTS - SessionApiService (CRUD)
  * 
- * JUSTIFICATION : Ces tests sont ESSENTIELS car ils couvrent :
+ * Ces tests couvrent :
  * 1. API MÉTIER : CRUD sessions = fonctions business principales de l'app
  * 2. GESTION DONNÉES : Persistance et récupération des sessions yoga
  * 3. GESTION ERREURS : Robustesse face aux erreurs réseau/serveur
  * 4. INTÉGRITÉ : Opérations critiques (créer/supprimer sessions)
- * 
- * Réduit volontairement : participate/unParticipate testés en E2E (parcours utilisateur)
  */
 describe('SessionApiService', () => {
   let service: SessionApiService;

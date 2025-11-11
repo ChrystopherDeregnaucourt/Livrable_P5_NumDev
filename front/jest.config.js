@@ -8,6 +8,7 @@ module.exports = {
   verbose: false,
   collectCoverage: false,
   coverageDirectory: './coverage/jest',
+  testMatch: ['**/*.spec.ts', '**/*.integration.spec.ts'],
   testPathIgnorePatterns: ['<rootDir>/node_modules/'],
   coveragePathIgnorePatterns: ['<rootDir>/node_modules/'],
   coverageThreshold: {

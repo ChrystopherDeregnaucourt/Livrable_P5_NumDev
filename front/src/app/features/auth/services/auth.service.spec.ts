@@ -7,15 +7,12 @@ import { SessionInformation } from 'src/app/interfaces/sessionInformation.interf
 import { AuthService } from './auth.service';
 
 /**
- * TESTS CRITIQUES - AuthService
- * 
- * JUSTIFICATION : Ces tests sont ESSENTIELS car ils couvrent :
+ * Ces tests couvrent :
  * 1. SÉCURITÉ : Authentification = point d'entrée sécurité de l'app
  * 2. MÉTIER : Login/Register = fonctions business critiques  
  * 3. IMPACT : Échec auth = application inutilisable
- * 
- * Alternative testée en E2E : Parcours complet utilisateur avec UI
  */
+
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;

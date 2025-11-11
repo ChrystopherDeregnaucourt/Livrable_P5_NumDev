@@ -1,18 +1,18 @@
+/// <reference types="jest" />
+
 import { TestBed } from '@angular/core/testing';
 import { expect } from '@jest/globals';
 import { SessionInformation } from '../interfaces/sessionInformation.interface';
 import { SessionService } from './session.service';
 
 /**
- * TESTS CRITIQUES - SessionService
+ * TESTS - SessionService
  * 
- * JUSTIFICATION : Ces tests sont ESSENTIELS car ils couvrent :
+ * Tests :
  * 1. ÉTAT GLOBAL : Gestion de l'état utilisateur dans toute l'app
  * 2. SÉCURITÉ : Contrôle accès basé sur l'état de connexion
  * 3. PERSISTANCE : Stockage localStorage pour maintenir la session
  * 4. RÉACTIVITÉ : Observable $isLogged() utilisé par tous les guards
- * 
- * Impact critique : Défaillance = perte de session, accès non autorisé
  */
 describe('SessionService', () => {
   let service: SessionService;
